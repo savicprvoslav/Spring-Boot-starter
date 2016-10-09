@@ -9,7 +9,7 @@ public interface TestService {
 	public String test();
 
 	Collection<TestEntity> testRepository();
-	
+
 	TestEntity create();
 
 }

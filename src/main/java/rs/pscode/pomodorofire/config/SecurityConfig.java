@@ -16,8 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
-	
-	
+
 	public static class Roles {
 		public static final String ANONYMOUS = "ANONYMOUS";
 		public static final String USER = "USER";
@@ -35,15 +34,12 @@ public class SecurityConfig {
 		private static Logger logger = Logger.getLogger(AuthenticationSecurity.class);
 
 		@Autowired
-		@Qualifier(value="UserService")
+		@Qualifier(value = "UserService")
 		private UserDetailsService userService;
 
 		@Override
 		public void init(AuthenticationManagerBuilder auth) throws Exception {
-			
 			auth.userDetailsService(userService);
-			// auth.inMemoryAuthentication().withUser("admin").password("admin").roles(Roles.ADMIN).and().withUser("user")
-			// .password("user").roles(Roles.USER);
 		}
 	}
 
@@ -54,7 +50,7 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http//
-			.httpBasic().and().authorizeRequests()//
+					.httpBasic().and().authorizeRequests()//
 
 					.antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
 					.antMatchers("/api/client/**").hasRole(Roles.USER)//

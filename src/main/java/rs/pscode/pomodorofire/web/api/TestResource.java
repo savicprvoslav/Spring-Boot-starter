@@ -51,7 +51,7 @@ public class TestResource {
 
 	@RequestMapping(value = "/api/admin/test")
 	@ResponseStatus(code = HttpStatus.OK)
-	public Object apiAdminTest(Principal principal) {
+	public List<TestJson> apiAdminTest(Principal principal) {
 		// UserDetails userDetails = (UserDetails)
 		// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -59,6 +59,5 @@ public class TestResource {
 		}.getType();
 
 		return modelMapper.map(testService.testRepository(), listType);
-
 	}
 }

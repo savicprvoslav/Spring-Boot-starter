@@ -5,9 +5,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import rs.pscode.pomodorofire.service.exception.AbstractException;
 
 @ControllerAdvice
 public class ExceptionHandler {
@@ -39,13 +36,10 @@ public class ExceptionHandler {
 
 	}
 
-	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	@org.springframework.web.bind.annotation.ExceptionHandler(value = AccessDeniedException.class)
 	public @ResponseBody ErrorResponse handleBaseException(AccessDeniedException e) {
-		e.printStackTrace();
 		return new ErrorResponse(e.getMessage(), "");
 	}
-	
-	
-	
+
 }
