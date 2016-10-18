@@ -21,8 +21,10 @@ import rs.pscode.pomodorofire.domain.dao.UserDao;
 import rs.pscode.pomodorofire.domain.model.RoleEntity;
 import rs.pscode.pomodorofire.domain.model.UserEntity;
 
-@Service(value = "UserService")
+@Service(value = UserServiceImpl.NAME)
 public class UserServiceImpl implements UserDetailsService {
+
+	public final static String NAME = "UserService";
 
 	@Autowired
 	private UserDao userDao;
