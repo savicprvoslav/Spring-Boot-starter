@@ -221,6 +221,45 @@ spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=create-drop
 
 ```
+## Swagger 2
+Swagger 2 is enabled only in 'dev' profile.
+
+```
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+	@Bean
+	@Profile("dev")
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any()).build();
+	}
+	
+	@Bean
+	@Profile("prod")
+	public Docket apiProd() {
+		return new Docket(DocumentationType.SWAGGER_2).enable(false).select().apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any()).build();
+	}
+}
+```
+
+For swagger especial configuration is added in spring security section and WebSecurityConfigurerAdapter
+```
+		
+@Override
+   public void configure(WebSecurity web) throws Exception {
+	        web.ignoring().antMatchers("/v2/api-docs",
+		                           "/configuration/ui", 
+					   "/swagger-resources",
+					   "/configuration/security",
+					   "/swagger-ui.html",
+					   "/webjars/**");
+	    }
+```
+
+Swagger UI is accessible on ``` http://localhost:8080/swagger-ui.html ```
+
 
 ## TODO 
 Add unit tests
