@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,19 +38,19 @@ public class TestResource {
 	@Value("${env}")
 	private String environment;
 
-	@RequestMapping(value = "/api/open/test")
+	@RequestMapping(value = "/api/open/test", method = RequestMethod.GET)
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public Object apiOpenTest() {
 		return new HashMap<String, String>();
 	}
 
-	@RequestMapping(value = "/api/client/test")
+	@RequestMapping(value = "/api/client/test", method = RequestMethod.POST)
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public TestJson apiClientTest() {
 		return modelMapper.map(testService.create(), TestJson.class);
 	}
 
-	@RequestMapping(value = "/api/admin/test")
+	@RequestMapping(value = "/api/admin/test", method = RequestMethod.GET)
 	@ResponseStatus(code = HttpStatus.OK)
 	public List<TestJson> apiAdminTest(Principal principal) {
 		// UserDetails userDetails = (UserDetails)
