@@ -1,7 +1,6 @@
 package rs.pscode.pomodorofire.config.auth.firebase;
 
 import java.io.IOException;
-import java.util.Random;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,34 +11,55 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import rs.pscode.pomodorofire.service.FirebaseService;
+import rs.pscode.pomodorofire.service.exception.FirebaseTokenInvalidException;
+import rs.pscode.pomodorofire.util.StringUtil;
+
 public class FirebaseFilter extends OncePerRequestFilter {
+
+	private static String HEADER_NAME = "X-Authorization-Firebase";
+
+	private FirebaseService firebaseService;
+
+	public FirebaseFilter(FirebaseService firebaseService) {
+		this.firebaseService = firebaseService;
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-		String xAuth = request.getHeader("X-Authorization-Firebase");
+		String xAuth = request.getHeader(HEADER_NAME);
+		if (StringUtil.isBlank(xAuth)) {
+			filterChain.doFilter(request, response);
+			return;
+		} else {
+			try {
+				FirebaseTokenHolder holder = firebaseService.parseToken(xAuth);
 
-		// validate the value in xAuth
-		if (!isValid(xAuth)) {
-			throw new SecurityException();
+				// Task<FirebaseToken> authTask =
+				// FirebaseAuth.getInstance().verifyIdToken(xAuth);
+				//
+				// try {
+				// Tasks.await(authTask);
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// throw new FirebaseTokenInvalidException(e.getMessage());
+				// }
+				//
+				// FirebaseTokenHolder holder = new
+				// FirebaseTokenHolder(authTask.getResult());
+				//
+				String userName = holder.getUid();
+
+				Authentication auth = new FirebaseAuthenticationToken(userName, holder);
+				SecurityContextHolder.getContext().setAuthentication(auth);
+
+				filterChain.doFilter(request, response);
+			} catch (FirebaseTokenInvalidException e) {
+				throw new SecurityException(e);
+			}
 		}
-
-		// The token is 'valid' so magically get a user id from it
-		String userName = getUserIdFromToken(xAuth);
-
-		// Create our Authentication and let Spring know about it
-		Authentication auth = new PomodoroAuthenticationToken(userName, xAuth);
-		SecurityContextHolder.getContext().setAuthentication(auth);
-
-		filterChain.doFilter(request, response);
 	}
 
-	private Boolean isValid(String token) {
-		return new Random().nextBoolean();
-	}
-
-	private String getUserIdFromToken(String token) {
-		return "admin";
-	}
 }

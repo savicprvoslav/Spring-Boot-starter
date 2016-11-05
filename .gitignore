@@ -15,3 +15,4 @@ hs_err_pid*
 .project
 .settings/
 target/
+src/main/resources/TestFireBaseAuth-c273d57720d5.json

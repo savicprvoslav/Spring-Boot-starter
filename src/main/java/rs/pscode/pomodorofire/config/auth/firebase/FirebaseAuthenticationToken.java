@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
  * @author prvoslav
  *
  */
-public class PomodoroAuthenticationToken extends AbstractAuthenticationToken {
+public class FirebaseAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static final long serialVersionUID = -1869548136546750302L;
 	private final Object principal;
@@ -23,7 +23,7 @@ public class PomodoroAuthenticationToken extends AbstractAuthenticationToken {
 	 * {@link #isAuthenticated()} will return <code>false</code>.
 	 *
 	 */
-	public PomodoroAuthenticationToken(Object principal, Object credentials) {
+	public FirebaseAuthenticationToken(Object principal, Object credentials) {
 		super(null);
 		this.principal = principal;
 		this.credentials = credentials;
@@ -40,7 +40,7 @@ public class PomodoroAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param credentials
 	 * @param authorities
 	 */
-	public PomodoroAuthenticationToken(Object principal, Object credentials,
+	public FirebaseAuthenticationToken(Object principal, Object credentials,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(authorities);
 		this.principal = principal;

@@ -4,15 +4,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,14 @@ import rs.pscode.pomodorofire.config.SecurityConfig.Roles;
 import rs.pscode.pomodorofire.domain.dao.UserDao;
 import rs.pscode.pomodorofire.domain.model.RoleEntity;
 import rs.pscode.pomodorofire.domain.model.UserEntity;
+import rs.pscode.pomodorofire.service.UserService;
+import rs.pscode.pomodorofire.service.shared.RegisterUserInit;
 
 @Service(value = UserServiceImpl.NAME)
-public class UserServiceImpl implements UserDetailsService {
+public class UserServiceImpl implements UserService {
 
 	public final static String NAME = "UserService";
+	private final static Logger logger = Logger.getLogger(UserServiceImpl.class);
 
 	@Autowired
 	private UserDao userDao;
@@ -43,23 +47,54 @@ public class UserServiceImpl implements UserDetailsService {
 				userDetails.getPassword(), userDetails.getAuthorities());
 	}
 
+	@Override
+	@Transactional
+	public UserEntity registerUser(RegisterUserInit init) {
+
+		UserEntity userLoaded = userDao.findByUsername(init.getUserName());
+
+		if (userLoaded == null) {
+			UserEntity userEntity = new UserEntity();
+			userEntity.setUsername(init.getUserName());
+			userEntity.setEmail(init.getEmail());
+
+			userEntity.setAuthorities(getUserRoles());
+			// TODO firebase users should not be able to login via username and
+			// password so for now generation of password is OK
+			userEntity.setPassword(UUID.randomUUID().toString());
+			userDao.save(userEntity);
+			logger.info("registerUser -> user created");
+			return userEntity;
+		} else {
+			logger.info("registerUser -> user exists");
+			return userLoaded;
+		}
+	}
+
 	@PostConstruct
 	public void init() {
+
 		if (userDao.count() == 0) {
 			UserEntity adminEntity = new UserEntity();
 			adminEntity.setUsername("admin");
 			adminEntity.setPassword("admin");
+			adminEntity.setEmail("savic.prvoslav@gmail.com");
 
 			adminEntity.setAuthorities(Collections.singletonList(new RoleEntity(Roles.ROLE_ADMIN)));
 			userDao.save(adminEntity);
 
 			UserEntity userEntity = new UserEntity();
-			userEntity.setUsername("user");
-			userEntity.setPassword("user");
-			userEntity.setAuthorities(Collections.singletonList(new RoleEntity(Roles.ROLE_USER)));
+			userEntity.setUsername("user1");
+			userEntity.setPassword("user1");
+			userEntity.setEmail("savic.prvoslav@gmail.com");
+			userEntity.setAuthorities(getUserRoles());
 
 			userDao.save(userEntity);
 		}
+	}
+
+	private List<RoleEntity> getUserRoles() {
+		return Collections.singletonList(new RoleEntity(Roles.ROLE_USER));
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -32,6 +34,10 @@ public class UserEntity implements UserDetails {
 
 	@Column(name = "PASSWORD_", nullable = false)
 	private String password;
+
+	@Column(name = "EMAIL_", nullable = false)
+	@Email
+	private String email;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<RoleEntity> authorities;
@@ -82,6 +88,14 @@ public class UserEntity implements UserDetails {
 
 	public void setAuthorities(List<RoleEntity> authorities) {
 		this.authorities = authorities;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 
 }

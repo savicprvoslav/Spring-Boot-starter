@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import rs.pscode.pomodorofire.service.exception.FirebaseTokenInvalidException;
+import rs.pscode.pomodorofire.service.exception.FirebaseUserNotExistsException;
+
 @ControllerAdvice
 public class ExceptionHandler {
 	private class ErrorResponse {
@@ -39,7 +42,7 @@ public class ExceptionHandler {
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	@org.springframework.web.bind.annotation.ExceptionHandler(value = AccessDeniedException.class)
 	public @ResponseBody ErrorResponse handleBaseException(AccessDeniedException e) {
+		e.printStackTrace();
 		return new ErrorResponse(e.getMessage(), "");
 	}
-
 }
