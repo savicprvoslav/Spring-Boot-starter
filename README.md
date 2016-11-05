@@ -263,7 +263,7 @@ Swagger UI is accessible on ``` http://localhost:8080/swagger-ui.html ```
 ## Firebase integration
 
 Firebase is integrated and it allows clients that are authenticated by firebase to access REST APIs. There are several parts of the integration
-* Maven Dependecies
+* Maven Dependencies
 * Filter
 * Authentication provider
 * Token parsing
@@ -276,7 +276,7 @@ rs.pscode.firebase.enabled=true/false
 ```
 in application.properties. This will register especial FirebaseFilter and authentication provider.
 
-### Dependecies 
+### Dependencies 
 ```
 <dependency>
 	<groupId>com.google.firebase</groupId>
