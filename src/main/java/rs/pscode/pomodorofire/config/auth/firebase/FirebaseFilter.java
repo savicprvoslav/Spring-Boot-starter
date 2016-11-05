@@ -37,19 +37,6 @@ public class FirebaseFilter extends OncePerRequestFilter {
 			try {
 				FirebaseTokenHolder holder = firebaseService.parseToken(xAuth);
 
-				// Task<FirebaseToken> authTask =
-				// FirebaseAuth.getInstance().verifyIdToken(xAuth);
-				//
-				// try {
-				// Tasks.await(authTask);
-				// } catch (Exception e) {
-				// e.printStackTrace();
-				// throw new FirebaseTokenInvalidException(e.getMessage());
-				// }
-				//
-				// FirebaseTokenHolder holder = new
-				// FirebaseTokenHolder(authTask.getResult());
-				//
 				String userName = holder.getUid();
 
 				Authentication auth = new FirebaseAuthenticationToken(userName, holder);
