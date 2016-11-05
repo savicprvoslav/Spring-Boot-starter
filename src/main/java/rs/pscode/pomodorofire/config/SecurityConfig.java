@@ -96,8 +96,6 @@ public class SecurityConfig {
 				.and().csrf().disable()//
 				.anonymous().authorities(Roles.ROLE_ANONYMOUS);//
 			}
-
-			
 		}
 
 		@Autowired(required = false)
