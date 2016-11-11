@@ -1,7 +1,9 @@
 # Spring-Boot-Starter
 
 ## Intro
-Spring boot makes it easy to get started but putting together features like security, jpa, spring-data, user authentication on both mysql and embedded database , roles and profiles can sometimes take your time away. Main goal is to help start creating backend application to be used as REST API for multiple client applications, like android, iOS , angular and other clients.  
+Spring boot makes it easy to get started but putting together features like security, jpa, spring-data, user authentication on both mysql and embedded database , roles and profiles can sometimes take your time away. Main goal is to help start creating backend application to be used as REST API for multiple client applications, like android, iOS , angular and other clients.
+
+Firebase is included in the project, with simple configuration you can allow client apps to authenticate using google token provided in the header. Filter is created and authentication provider that clearly demonstrate how to authenticate user using google token.
 
 ## Included spring boot starters
 
