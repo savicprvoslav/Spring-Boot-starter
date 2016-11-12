@@ -260,6 +260,20 @@ For swagger especial configuration is added in spring security section and WebSe
 
 Swagger UI is accessible on ``` http://localhost:8080/swagger-ui.html ```
 
+##Swagger code-gen
+
+To generate retrofit2 client code you should download swagger.jar and execute it using next command
+```
+java -jar swagger.jar generate -i http://localhost:8080/v2/api-docs  -l java --library=retrofit2 -DmodelPackage=rs.pscode.start.model,apiPackage=rs.pscode.start.api -o spring-boot-starter-genereated
+```
+Therea are several parameters used
+* -i Indicates the URL to the api-docs
+* -l language, java 
+* --library , retrofit2
+* modelPacakge and apiPackage
+* -o , output folder 
+
+
 
 ## TODO 
 Add unit tests

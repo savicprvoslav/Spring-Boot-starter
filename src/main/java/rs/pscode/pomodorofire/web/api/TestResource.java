@@ -55,7 +55,7 @@ public class TestResource {
 
 	@RequestMapping(value = "/api/admin/test", method = RequestMethod.GET)
 	@ResponseStatus(code = HttpStatus.OK)
-	public List<TestJson> apiAdminTest(Principal principal) {
+	public List<TestJson> apiAdminTest() {
 		printUser();
 		Type listType = new TypeToken<List<TestJson>>() {
 		}.getType();

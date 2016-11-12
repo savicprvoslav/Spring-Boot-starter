@@ -17,9 +17,9 @@ public class SwaggerConfig {
 	@Profile("dev")
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
-				.paths(PathSelectors.any()).build();
+				.paths(PathSelectors.regex("/api.*")).build();
 	}
-	
+
 	@Bean
 	@Profile("prod")
 	public Docket apiProd() {

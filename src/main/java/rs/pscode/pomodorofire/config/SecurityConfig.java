@@ -70,7 +70,7 @@ public class SecurityConfig {
 		@Override
 		public void configure(WebSecurity web) throws Exception {
 			web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources",
-					"/configuration/security", "/swagger-ui.html", "/webjars/**");
+					"/configuration/security", "/swagger-ui.html", "/webjars/**", "/v2/swagger.json");
 		}
 
 		@Override
@@ -78,23 +78,23 @@ public class SecurityConfig {
 			if (firebaseEnabled) {
 				http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class).authorizeRequests()//
 
-				.antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
-				.antMatchers("/api/client/**").hasRole(Roles.USER)//
-				.antMatchers("/api/admin/**").hasAnyRole(Roles.ADMIN)//
-				.antMatchers("/health/**").hasAnyRole(Roles.ADMIN)//
-				.antMatchers("/**").denyAll()//
-				.and().csrf().disable()//
-				.anonymous().authorities(Roles.ROLE_ANONYMOUS);//
+						.antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
+						.antMatchers("/api/client/**").hasRole(Roles.USER)//
+						.antMatchers("/api/admin/**").hasAnyRole(Roles.ADMIN)//
+						.antMatchers("/health/**").hasAnyRole(Roles.ADMIN)//
+						.antMatchers("/**").denyAll()//
+						.and().csrf().disable()//
+						.anonymous().authorities(Roles.ROLE_ANONYMOUS);//
 			} else {
 				http.httpBasic().and().authorizeRequests()//
 
-				.antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
-				.antMatchers("/api/client/**").hasRole(Roles.USER)//
-				.antMatchers("/api/admin/**").hasAnyRole(Roles.ADMIN)//
-				.antMatchers("/health/**").hasAnyRole(Roles.ADMIN)//
-				.antMatchers("/**").denyAll()//
-				.and().csrf().disable()//
-				.anonymous().authorities(Roles.ROLE_ANONYMOUS);//
+						.antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
+						.antMatchers("/api/client/**").hasRole(Roles.USER)//
+						.antMatchers("/api/admin/**").hasAnyRole(Roles.ADMIN)//
+						.antMatchers("/health/**").hasAnyRole(Roles.ADMIN)//
+						.antMatchers("/**").denyAll()//
+						.and().csrf().disable()//
+						.anonymous().authorities(Roles.ROLE_ANONYMOUS);//
 			}
 		}
 
