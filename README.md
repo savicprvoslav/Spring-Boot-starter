@@ -1,7 +1,9 @@
 # Spring-Boot-Starter
 
 ## Intro
-Spring boot makes it easy to get started but putting together features like security, jpa, spring-data, user authentication on both mysql and embedded database , roles and profiles can sometimes take your time away. Main goal is to help start creating backend application to be used as REST API for multiple client applications, like android, iOS , angular and other clients.  
+Spring boot makes it easy to get started but putting together features like security, jpa, spring-data, user authentication on both mysql and embedded database , roles and profiles can sometimes take your time away. Main goal is to help start creating backend application to be used as REST API for multiple client applications, like android, iOS , angular and other clients.
+
+Firebase is included in the project, with simple configuration you can allow client apps to authenticate using google token provided in the header. Filter is created and authentication provider that clearly demonstrate how to authenticate user using google token.
 
 ## Included spring boot starters
 
@@ -260,6 +262,7 @@ For swagger especial configuration is added in spring security section and WebSe
 
 Swagger UI is accessible on ``` http://localhost:8080/swagger-ui.html ```
 
+
 ##Swagger code-gen
 
 To generate retrofit2 client code you should download swagger.jar and execute it using next command
@@ -273,6 +276,168 @@ Therea are several parameters used
 * modelPacakge and apiPackage
 * -o , output folder 
 
+
+
+## Firebase integration
+
+Firebase is integrated and it allows clients that are authenticated by firebase to access REST APIs. There are several parts of the integration
+* Maven Dependencies
+* Filter
+* Authentication provider
+* Token parsing
+* Registration
+
+
+Firebase can be enabled by setting 
+```
+rs.pscode.firebase.enabled=true/false
+```
+in application.properties. This will register especial FirebaseFilter and authentication provider.
+
+### Dependencies 
+```
+<dependency>
+	<groupId>com.google.firebase</groupId>
+	<artifactId>firebase-server-sdk</artifactId>
+	<version>3.0.1</version>
+</dependency>
+```
+
+### Firebase filter
+
+Filter checks if  header named "X-Authorization-Firebase" exists, if does not this means that request should not be processed by this filter. When token is found it is parsed using ```firebaseService.parseToken(xAuth)``` and correct Authentication is created ```FirebaseAuthenticationToken``` that is put in the securityContextHolder. Job of the filter is here done and authentication process is being taken over by authentication provider.
+
+
+```
+public class FirebaseFilter extends OncePerRequestFilter {
+
+	private static String HEADER_NAME = "X-Authorization-Firebase";
+
+	private FirebaseService firebaseService;
+
+	public FirebaseFilter(FirebaseService firebaseService) {
+		this.firebaseService = firebaseService;
+	}
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		String xAuth = request.getHeader(HEADER_NAME);
+		if (StringUtil.isBlank(xAuth)) {
+			filterChain.doFilter(request, response);
+			return;
+		} else {
+			try {
+				FirebaseTokenHolder holder = firebaseService.parseToken(xAuth);
+
+				String userName = holder.getUid();
+
+				Authentication auth = new FirebaseAuthenticationToken(userName, holder);
+				SecurityContextHolder.getContext().setAuthentication(auth);
+
+				filterChain.doFilter(request, response);
+			} catch (FirebaseTokenInvalidException e) {
+				throw new SecurityException(e);
+			}
+		}
+	}
+
+}
+```
+
+### Authentication provider
+Authentication provider is made so that we map the firebase user to our database. Provider only supports FirebaseAuthenticationToken.
+
+```
+@Component
+public class FirebaseAuthenticationProvider implements AuthenticationProvider {
+
+	@Autowired
+	@Qualifier(value = UserServiceImpl.NAME)
+	private UserDetailsService userService;
+
+	public boolean supports(Class<?> authentication) {
+		return (FirebaseAuthenticationToken.class.isAssignableFrom(authentication));
+	}
+
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		if (!supports(authentication.getClass())) {
+			return null;
+		}
+
+		FirebaseAuthenticationToken authenticationToken = (FirebaseAuthenticationToken) authentication;
+		UserDetails details = userService.loadUserByUsername(authenticationToken.getName());
+		if (details == null) {
+			throw new FirebaseUserNotExistsException();
+		}
+
+		authenticationToken = new FirebaseAuthenticationToken(details, authentication.getCredentials(),
+				details.getAuthorities());
+
+		return authenticationToken;
+	}
+
+}
+
+```
+
+## Firebase Token parser
+Firebase parse validates the token and returns instance of especial class FirebaseTokenHolder.
+
+```
+public class FirebaseParser {
+	public FirebaseTokenHolder parseToken(String idToken) {
+		if (StringUtil.isBlank(idToken)) {
+			throw new IllegalArgumentException("FirebaseTokenBlank");
+		}
+		try {
+			Task<FirebaseToken> authTask = FirebaseAuth.getInstance().verifyIdToken(idToken);
+
+			Tasks.await(authTask);
+
+			return new FirebaseTokenHolder(authTask.getResult());
+		} catch (Exception e) {
+			throw new FirebaseTokenInvalidException(e.getMessage());
+		}
+	}
+```
+
+One of the key parts of the firebase integration is the application initialization. To complete the initialization you must downlod json from firebase console , check this link https://firebase.google.com/docs/server/setup .
+
+```
+@Configuration
+public class FirebaseConfig {
+
+	@Bean
+	public DatabaseReference firebaseDatabse() {
+		DatabaseReference firebase = FirebaseDatabase.getInstance().getReference();
+		return firebase;
+	}
+
+	@Value("${rs.pscode.firebase.database.url}")
+	private String databaseUrl;
+
+	@Value("${rs.pscode.firebase.config.path}")
+	private String configPath;
+
+	@PostConstruct
+	public void init() {
+
+		/**
+		 * https://firebase.google.com/docs/server/setup
+		 * 
+		 * Create service account , download json
+		 */
+		InputStream inputStream = FirebaseConfig.class.getClassLoader().getResourceAsStream(configPath);
+
+		FirebaseOptions options = new FirebaseOptions.Builder().setServiceAccount(inputStream)
+				.setDatabaseUrl(databaseUrl).build();
+		FirebaseApp.initializeApp(options);
+		
+	}
+}
+```
 
 
 ## TODO 
