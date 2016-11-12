@@ -37,6 +37,7 @@ public class UserEntity implements UserDetails {
 
 	@Column(name = "EMAIL_", nullable = false)
 	@Email
+	//TODO add unique index
 	private String email;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

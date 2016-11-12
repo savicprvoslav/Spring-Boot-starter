@@ -6,10 +6,8 @@ import rs.pscode.pomodorofire.domain.model.TestEntity;
 
 public interface TestService {
 
-	public String test();
+	Collection<TestEntity> findAll();
 
-	Collection<TestEntity> testRepository();
-
-	TestEntity create();
+	TestEntity create(String name);
 
 }

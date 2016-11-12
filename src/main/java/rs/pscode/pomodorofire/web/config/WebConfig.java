@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import rs.pscode.pomodorofire.domain.model.TestEntity;
-import rs.pscode.pomodorofire.web.dto.TestJson;
+import rs.pscode.pomodorofire.web.dto.test.TestJson;
 
 @Configuration
 public class WebConfig {
@@ -22,6 +22,7 @@ public class WebConfig {
 				TestEntity entity = context.getSource();
 				TestJson testJson = context.getDestination();
 				testJson.setOutId(entity.getId());
+				testJson.setName(entity.getName());
 
 				return testJson;
 			}

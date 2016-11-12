@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
+	@Secured(value = Roles.ROLE_ANONYMOUS)
 	public UserEntity registerUser(RegisterUserInit init) {
 
 		UserEntity userLoaded = userDao.findByUsername(init.getUserName());
@@ -80,7 +82,7 @@ public class UserServiceImpl implements UserService {
 			adminEntity.setPassword("admin");
 			adminEntity.setEmail("savic.prvoslav@gmail.com");
 
-			adminEntity.setAuthorities(Collections.singletonList(new RoleEntity(Roles.ROLE_ADMIN)));
+			adminEntity.setAuthorities(getAdminRoles());
 			userDao.save(adminEntity);
 
 			UserEntity userEntity = new UserEntity();
@@ -91,6 +93,10 @@ public class UserServiceImpl implements UserService {
 
 			userDao.save(userEntity);
 		}
+	}
+	
+	private List<RoleEntity> getAdminRoles(){
+		return Collections.singletonList(new RoleEntity(Roles.ROLE_ADMIN));
 	}
 
 	private List<RoleEntity> getUserRoles() {
