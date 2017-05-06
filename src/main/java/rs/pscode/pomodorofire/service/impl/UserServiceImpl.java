@@ -19,7 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import rs.pscode.pomodorofire.config.SecurityConfig.Roles;
-import rs.pscode.pomodorofire.domain.dao.UserDao;
+import rs.pscode.pomodorofire.domain.dao.RoleRepository;
+import rs.pscode.pomodorofire.domain.dao.UserRepository;
 import rs.pscode.pomodorofire.domain.model.RoleEntity;
 import rs.pscode.pomodorofire.domain.model.UserEntity;
 import rs.pscode.pomodorofire.service.UserService;
@@ -32,7 +33,10 @@ public class UserServiceImpl implements UserService {
 	private final static Logger logger = Logger.getLogger(UserServiceImpl.class);
 
 	@Autowired
-	private UserDao userDao;
+	private UserRepository userDao;
+
+	@Autowired
+	private RoleRepository roleRepository;
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserDetails userDetails = userDao.findByUsername(username);
@@ -94,13 +98,27 @@ public class UserServiceImpl implements UserService {
 			userDao.save(userEntity);
 		}
 	}
-	
-	private List<RoleEntity> getAdminRoles(){
-		return Collections.singletonList(new RoleEntity(Roles.ROLE_ADMIN));
+
+	private List<RoleEntity> getAdminRoles() {
+		return Collections.singletonList(getRole(Roles.ROLE_ADMIN));
 	}
 
 	private List<RoleEntity> getUserRoles() {
-		return Collections.singletonList(new RoleEntity(Roles.ROLE_USER));
+		return Collections.singletonList(getRole(Roles.ROLE_USER));
+	}
+
+	/**
+	 * Get or create role
+	 * @param authority
+	 * @return
+	 */
+	private RoleEntity getRole(String authority) {
+		RoleEntity adminRole = roleRepository.findByAuthority(authority);
+		if (adminRole == null) {
+			return new RoleEntity(authority);
+		} else {
+			return adminRole;
+		}
 	}
 
 }
